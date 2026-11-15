@@ -1,3 +1,7 @@
-namespace Ingestion;
+namespace Yale.Ingestion;
 
-public readonly record struct LineReference(long Offset, long Length);
+public readonly struct LineReference(long offset, long length)
+{
+    public long Offset { get; } = offset;
+    public long Length { get; } = length;
+}

@@ -1,4 +1,4 @@
-namespace Ingestion;
+namespace Yale.Ingestion;
 
 public sealed class LineScanner
 {

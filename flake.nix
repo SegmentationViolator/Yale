@@ -6,7 +6,6 @@
 
     outputs =
         {
-            self,
             nixpkgs,
             systems,
             ...
@@ -22,7 +21,9 @@
             in
             {
                 devShell = eachSystem (system: aliases.${system}.pkgs.mkShell {
-                    packages = with aliases.${system}.pkgs; [ dotnet-sdk_10 ];
+                    packages = with aliases.${system}.pkgs; [
+                        dotnet-sdk_10
+                    ];
                 });
             };
 }

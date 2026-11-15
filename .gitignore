@@ -2,3 +2,4 @@
 .envrc
 [Oo]bj
 [Bb]in
+BenchmarkDotNet.Artifacts

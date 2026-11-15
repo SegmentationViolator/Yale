@@ -1,6 +1,6 @@
 using System.IO.MemoryMappedFiles;
 
-namespace Ingestion;
+namespace Yale.Ingestion;
 
 public sealed class Reader : IDisposable
 {
@@ -11,7 +11,7 @@ public sealed class Reader : IDisposable
     private readonly MemoryMappedViewAccessor? _view;
     private bool _disposed;
 
-    public delegate void Consumer(ReadOnlySpan<byte> bytes);
+    public delegate void ReadOnlySpanAction(ReadOnlySpan<byte> bytes);
 
     public Reader(string path)
     {
@@ -37,7 +37,7 @@ public sealed class Reader : IDisposable
         }
     }
 
-    public void Read(long offset, int length, Reader.Consumer consumer)
+    public void Read(long offset, int length, Reader.ReadOnlySpanAction action)
     {
         ObjectDisposedException.ThrowIf(this._disposed, this);
 
@@ -49,7 +49,7 @@ public sealed class Reader : IDisposable
 
         if (length == 0 || offset == this.FileLength || this._mapping is null)
         {
-            consumer(ReadOnlySpan<byte>.Empty);
+            action(ReadOnlySpan<byte>.Empty);
             return;
         }
 
@@ -66,7 +66,7 @@ public sealed class Reader : IDisposable
                 handle.AcquirePointer(ref pointer);
                 pointer += this._view!.PointerOffset + offset;
 
-                consumer(new ReadOnlySpan<byte>(pointer, (int)availableLength));
+                action(new ReadOnlySpan<byte>(pointer, (int)availableLength));
             }
             finally
             {

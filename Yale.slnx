@@ -1,5 +1,9 @@
 <Solution>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/Yale.Benchmarks/Yale.Benchmarks.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Yale.Ingestion/Yale.Ingestion.csproj" />
+    <Project Path="src/Yale.Parsing/Yale.Parsing.csproj" />
   </Folder>
 </Solution>
