@@ -1,3 +1,5 @@
+global using GrokValue = Unio.Unio<int, long, double, float, bool, string>;
+
 using System.Collections.Immutable;
 using System.Text;
 using PCRE;
@@ -8,16 +10,17 @@ public sealed class GrokPattern
 {
     private readonly PcreRegexUtf8 _pcreRegex;
     private readonly PcreMatchBuffer8Bit _pcreMatchBuffer;
+    private readonly ImmutableArray<(string, int)> _indexMap;
     private readonly ImmutableDictionary<string, GrokType> _typeMap;
 
-    internal static ReadOnlySpan<char> ParseIdentifier(string pattern, ref int offset)
+    private static ReadOnlySpan<char> ParseIdentifier(string pattern, scoped ref int offset)
     {
         if (offset >= pattern.Length)
             throw new GrokException($"expected an identifier at index {offset}");
 
         int start = offset;
 
-        if (!Char.IsLetter(pattern[offset + 2]) && pattern[offset + 2] != '_')
+        if (!Char.IsLetter(pattern[offset]) && pattern[offset] != '_')
             throw new GrokException($"invalid identifier start character: '{pattern[offset + 2]}'");
 
         do
@@ -35,42 +38,51 @@ public sealed class GrokPattern
 
         while (offset < pattern.Length)
         {
-            if (offset + 4 >= pattern.Length || pattern[offset] != '%' || pattern[offset + 1] != '{')
-                pcrePattern.Append(pattern[offset]);
+            if (offset + 1 >= pattern.Length || pattern[offset] != '%' || pattern[offset + 1] != '{')
+            {
+                pcrePattern.Append(pattern[offset++]);
+                continue;
+            }
 
             offset += 2;
             ReadOnlySpan<char> name = GrokPattern.ParseIdentifier(pattern, ref offset);
 
-            if (offset >= pattern.Length)
-                throw new GrokException($"expected '}}' at index {offset}");
+            var identifier = ReadOnlySpan<char>.Empty;
 
-            if (pattern[offset] == ':')
+            if (offset < pattern.Length && pattern[offset] == ':')
             {
                 offset++;
-                ReadOnlySpan<char> identifier = GrokPattern.ParseIdentifier(pattern, ref offset);
+                identifier = GrokPattern.ParseIdentifier(pattern, ref offset);
 
-                if (pattern[offset] == ':')
+                if (offset < pattern.Length && pattern[offset] == ':')
                 {
                     offset++;
                     ReadOnlySpan<char> type = GrokPattern.ParseIdentifier(pattern, ref offset);
 
-                    try
-                    {
-                        typeMap.Add(identifier.ToString(), GrokTypeExtensions.Get(type));
-                    }
-                    catch (ArgumentException ex)
-                    {
-                        throw new GrokException($"duplicate identifier: {identifier}", ex);
-                    }
+                    if (!typeMap.TryAdd(identifier.ToString(), GrokTypeExtensions.Get(type)))
+                        throw new GrokException($"duplicate identifier: {identifier}");
                 }
             }
+
+            if (offset >= pattern.Length)
+                throw new GrokException($"expected '}}' at index {offset}");
 
             if (pattern[offset] != '}')
                 throw new GrokException($"expected '}}', found '{pattern[offset]}'");
 
             offset++;
             GrokNamedPattern namedPattern = GrokNamedPatterns.Get(name);
-            pcrePattern.Append(namedPattern.Pattern);
+
+            if (!identifier.IsEmpty)
+                pcrePattern.Append("(?<")
+                    .Append(identifier)
+                    .Append('>')
+                    .Append(namedPattern.Pattern)
+                    .Append(')');
+            else
+                pcrePattern.Append("(?:")
+                    .Append(namedPattern.Pattern)
+                    .Append(')');
 
             foreach (var item in namedPattern.TypeMap)
             {
@@ -90,15 +102,51 @@ public sealed class GrokPattern
             PcreOptions.Compiled | PcreOptions.Ucp
         );
 
-        var seen = new HashSet<string>();
+        PcrePatternInfo patternInfo = this._pcreRegex.PatternInfo;
+        IReadOnlyList<string> groupNames = patternInfo.GroupNames;
+        var indexMap = new List<(string, int)>(groupNames.Count);
 
-        foreach (var item in this._pcreRegex.PatternInfo.GroupNames)
+        foreach (var name in groupNames)
         {
-            if (!seen.Add(item))
-                throw new GrokException($"duplicate identifier: {item}");
+            IReadOnlyList<int> indexes = patternInfo.GetGroupIndexesByName(name);
+
+            if (indexes.Count > 1)
+                throw new GrokException($"duplicate identifier: {name}");
+
+            indexMap.Add((name, indexes[0]));
         }
 
         this._pcreMatchBuffer = this._pcreRegex.CreateMatchBuffer();
+        this._indexMap = indexMap.ToImmutableArray();
         this._typeMap = typeMap.ToImmutableDictionary();
+    }
+
+    public List<(Dictionary<string, GrokValue>, Range)> Parse(ReadOnlySpan<byte> subject)
+    {
+        var matches = new List<(Dictionary<string, GrokValue>, Range)>(this._indexMap.Length);
+
+        foreach (var match in this._pcreMatchBuffer.Matches(subject, 0, PcreMatchOptions.NoUtfCheck, null))
+        {
+            var entry = new Dictionary<string, GrokValue>();
+
+            foreach (var (name, index) in this._indexMap)
+            {
+                if (match.TryGetGroup(index, out var group) && group.Success)
+                {
+                    GrokValue value;
+
+                    if (this._typeMap.TryGetValue(name, out var type))
+                        value = type.Parse(group.Value);
+                    else
+                        value = Encoding.UTF8.GetString(group.Value);
+
+                    entry.Add(name, value);
+                }
+            }
+
+            matches.Add((entry, match.Index..match.EndIndex));
+        }
+
+        return matches;
     }
 }

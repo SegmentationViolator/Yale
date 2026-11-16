@@ -40,7 +40,7 @@ public partial class RegexBenchmarks
 
         this._groupNumbers = this._compiled.GetGroupNumbers();
 
-        this._pcreBuffer = this._pcreCompiled.PatternInfo.GroupNames.CreateMatchBuffer();
+        this._pcreBuffer = this._pcreCompiled.CreateMatchBuffer();
 
         string[] samples =
         {

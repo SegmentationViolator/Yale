@@ -1,4 +1,4 @@
-using Unio;
+using System.Text;
 
 namespace Yale.Parsing.Grok;
 
@@ -13,16 +13,6 @@ internal enum GrokType
 
 internal static class GrokTypeExtensions
 {
-    public static Unio<int, long, double, float, bool, DateTime> Parse(this GrokType type, ReadOnlySpan<char> value) => type switch
-    {
-        GrokType.Int => int.Parse(value),
-        GrokType.Long => long.Parse(value),
-        GrokType.Double => double.Parse(value),
-        GrokType.Float => float.Parse(value),
-        GrokType.Boolean => bool.Parse(value),
-        _ => throw new ArgumentOutOfRangeException(nameof(type))
-    };
-
     public static GrokType Get(ReadOnlySpan<char> type) => type switch
     {
         "int" => GrokType.Int,
@@ -30,6 +20,40 @@ internal static class GrokTypeExtensions
         "double" => GrokType.Double,
         "float" => GrokType.Float,
         "boolean" => GrokType.Boolean,
-        _ => throw new ArgumentException($"unknown Grok type: {name.ToString()}", nameof(name))
+        _ => throw new ArgumentException($"unknown Grok type: {type.ToString()}", nameof(type))
     };
+
+    public static GrokValue Parse(this GrokType type, ReadOnlySpan<byte> subject) => type switch
+    {
+        GrokType.Int => int.Parse(subject),
+        GrokType.Long => long.Parse(subject),
+        GrokType.Double => double.Parse(subject),
+        GrokType.Float => float.Parse(subject),
+        GrokType.Boolean => GrokTypeExtensions.ParseBool(subject),
+        _ => throw new ArgumentOutOfRangeException(nameof(type))
+    };
+
+    private static bool ParseBool(ReadOnlySpan<byte> subject)
+    {
+        static bool IsWhitespace(byte b) =>
+            b is 0x20 or (>= 0x09 and <= 0x0D);
+
+        while (!subject.IsEmpty && IsWhitespace(subject[0]))
+            subject = subject[1..];
+
+        while (!subject.IsEmpty && IsWhitespace(subject[^1]))
+            subject = subject[..^1];
+
+        if (Ascii.EqualsIgnoreCase(subject, "true"u8))
+        {
+            return true;
+        }
+        
+        if (Ascii.EqualsIgnoreCase(subject, "false"u8))
+        {
+            return false;
+        }
+
+        throw new FormatException($"invalid bool value: '{Encoding.UTF8.GetString(subject)}'");
+    }
 }
