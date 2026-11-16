@@ -48,7 +48,7 @@ internal static class GrokTypeExtensions
         {
             return true;
         }
-        
+
         if (Ascii.EqualsIgnoreCase(subject, "false"u8))
         {
             return false;

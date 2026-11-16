@@ -15,7 +15,7 @@ internal static class GrokNamedPatterns
     // Basic patterns
     private const string USERNAME = """[a-zA-Z0-9.\_-]+""";
     private const string EMAILLOCALPART = """[a-zA-Z0-9!#$%&'\*+\-/=?^\_\`{|}\~]{1,64}(?:\.[a-zA-Z0-9!#$%&'\*+\-/=?^\_\`{|}\~]{1,62}){0,63}""";
-    private const string EMAILADDRESS = $$"""{{EMAILLOCALPART}}@%{{HOSTNAME}}""";
+    private const string EMAILADDRESS = $$"""{{EMAILLOCALPART}}@{{HOSTNAME}}""";
 
     private const string INT = """(?:[+-]?(?:[0-9]+))""";
     private const string BASE10NUM = """(?<![0-9.+-])(?>[+-]?(?:(?:[0-9]+(?:\.[0-9]+)?)|(?:\.[0-9]+)))""";
@@ -46,10 +46,10 @@ internal static class GrokNamedPatterns
 
     private const string IPV4 = """(?<![0-9])(?:(?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]))(?![0-9])""";
 
-    private const string IP = $$"""(?:{{IPV6}}|%{{IPV4}})""";
+    private const string IP = $$"""(?:{{IPV6}}|{{IPV4}})""";
     private const string HOSTNAME = """\b(?:[0-9A-Za-z][0-9A-Za-z-]{0,62})(?:\.(?:[0-9A-Za-z][0-9A-Za-z-]{0,62}))*(\.?|\b)""";
     private const string IPORHOST = $$"""(?:{{IP}}|{{HOSTNAME}})""";
-    private const string HOSTPORT = $$"""{{IPORHOST}}:%{{POSINT}}""";
+    private const string HOSTPORT = $$"""{{IPORHOST}}:{{POSINT}}""";
 
     // Paths
     private const string PATH = $$"""(?:{{UNIXPATH}}|{{WINPATH}})""";

@@ -21,7 +21,7 @@ public sealed class GrokPattern
         int start = offset;
 
         if (!Char.IsLetter(pattern[offset]) && pattern[offset] != '_')
-            throw new GrokException($"invalid identifier start character: '{pattern[offset + 2]}'");
+            throw new GrokException($"invalid identifier start character: '{pattern[offset]}'");
 
         do
             offset++;
