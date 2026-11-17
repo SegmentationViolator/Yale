@@ -1,4 +1,5 @@
 global using GrokValue = Unio.Unio<int, long, double, float, bool, string>;
+global using GrokResult = (System.Collections.Immutable.ImmutableDictionary<string, Unio.Unio<int, long, double, float, bool, string>>, System.Range);
 
 using System.Collections.Immutable;
 using System.Text;
@@ -121,9 +122,9 @@ public sealed class GrokPattern
         this._typeMap = typeMap.ToImmutableDictionary();
     }
 
-    public List<(Dictionary<string, GrokValue>, Range)> Parse(ReadOnlySpan<byte> subject)
+    public List<GrokResult> Parse(ReadOnlySpan<byte> subject)
     {
-        var matches = new List<(Dictionary<string, GrokValue>, Range)>(this._indexMap.Length);
+        var matches = new List<GrokResult>(this._indexMap.Length);
 
         foreach (var match in this._pcreMatchBuffer.Matches(subject, 0, PcreMatchOptions.NoUtfCheck, null))
         {
@@ -144,7 +145,7 @@ public sealed class GrokPattern
                 }
             }
 
-            matches.Add((entry, match.Index..match.EndIndex));
+            matches.Add((entry.ToImmutableDictionary(), match.Index..match.EndIndex));
         }
 
         return matches;

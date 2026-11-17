@@ -53,7 +53,7 @@ public sealed class Reader : IDisposable
             return;
         }
 
-        long availableLength = Math.Min((int)(this.FileLength - offset), length);
+        int availableLength = (int)Math.Min(this.FileLength - offset, length);
 
         var handle = this._view!.SafeMemoryMappedViewHandle;
 

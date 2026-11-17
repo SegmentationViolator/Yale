@@ -86,7 +86,7 @@ internal static class GrokNamedPatterns
 
     private const string TIMESTAMP_ISO8601 = $$"""{{YEAR}}-{{MONTHNUM}}-{{MONTHDAY}}[T ]{{HOUR}}:?{{MINUTE}}(?::?{{SECOND}})?{{ISO8601_TIMEZONE}}?""";
     private const string DATE = $$"""{{DATE_US}}|{{DATE_EU}}""";
-    private const string DATESTAMP = $$"""{{DATE}}[- ]{{TIME}}""";
+    private const string DATESTAMP = $$"""(?:{{DATE}})[- ]{{TIME}}""";
     private const string TZ = """(?:[APMCE][SD]T|UTC)""";
 
     private const string DATESTAMP_RFC822 = $$"""{{DAY}} {{MONTH}} {{MONTHDAY}} {{YEAR}} {{TIME}} {{TZ}}""";

@@ -20,7 +20,7 @@ internal static class GrokTypeExtensions
         "double" => GrokType.Double,
         "float" => GrokType.Float,
         "boolean" => GrokType.Boolean,
-        _ => throw new ArgumentException($"unknown Grok type: {type.ToString()}", nameof(type))
+        _ => throw new GrokException($"unknown Grok type: {type.ToString()}")
     };
 
     public static GrokValue Parse(this GrokType type, ReadOnlySpan<byte> subject) => type switch
