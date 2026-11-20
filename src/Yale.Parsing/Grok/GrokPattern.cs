@@ -98,10 +98,17 @@ public sealed class GrokPattern
             }
         }
 
-        this._pcreRegex = new PcreRegexUtf8(
-            pcrePattern.ToString(),
-            PcreOptions.Compiled | PcreOptions.Ucp
-        );
+        try
+        {
+            this._pcreRegex = new PcreRegexUtf8(
+                pcrePattern.ToString(),
+                PcreOptions.Compiled | PcreOptions.Ucp
+            );
+        }
+        catch (PcrePatternException ex)
+        {
+            throw new GrokException("invalid regex pattern", ex);
+        }
 
         PcrePatternInfo patternInfo = this._pcreRegex.PatternInfo;
         IReadOnlyList<string> groupNames = patternInfo.GroupNames;

@@ -31,7 +31,7 @@ internal static class GrokNamedPatterns
     private const string DATA = """.*?""";
     private const string GREEDYDATA = """.*""";
 
-    private const string QUOTEDSTRING = """(?>(?<!\\)(?>"(?>\\.|[^\\"]+)+"|"|(?>'(?>\\.|[^\\']+)+')|''|(?>`(?>\\.|[^\\`]+)+`)|``))""";
+    private const string QUOTEDSTRING = """(?>(?<!\\)(?>"(?>\\.|[^\\"]+)+"|""|(?>'(?>\\.|[^\\']+)+')|''|(?>`(?>\\.|[^\\`]+)+`)|``))""";
     private const string UUID = """[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12}""";
 
     private const string URN = """urn:[0-9A-Za-z][0-9A-Za-z-]{0,31}:(?:%[0-9a-fA-F]{2}|[0-9A-Za-z()+,.:=@;$\_!\*'/?#-])+""";
@@ -53,7 +53,7 @@ internal static class GrokNamedPatterns
 
     // Paths
     private const string PATH = $$"""(?:{{UNIXPATH}}|{{WINPATH}})""";
-    private const string UNIXPATH = """(/[[[:alnum:]]\_%!$@:.,+\~-]*)+""";
+    private const string UNIXPATH = """(/[[:alnum:]\_%!$@:.,+\~-]*)+""";
     private const string TTY = """(?:/dev/(pts|tty([pq])?)(\w+)?/?(?:[0-9]+))""";
     private const string WINPATH = """(?>[A-Za-z]+:|\\)(?:\\[^\\?*]*)+""";
 
@@ -103,7 +103,7 @@ internal static class GrokNamedPatterns
     private const string HTTPDATE = $$"""{{MONTHDAY}}/{{MONTH}}/{{YEAR}}:{{TIME}} {{INT}}""";
 
     // Log formats
-    private const string SYSLOGBASE = $$"""(?<timestamp>{{SYSLOGTIMESTAMP}}) (?:{{SYSLOGFACILITY}} )?(?<host>{{SYSLOGHOST}}) {{SYSLOGPROG}}:""";
+    private const string SYSLOGBASE = $$"""(?<timestamp>{{SYSLOGTIMESTAMP}}) (?:{{SYSLOGFACILITY}} )?(?<hostname>{{SYSLOGHOST}}) {{SYSLOGPROG}}:""";
 
     // Log levels
     private const string LOGLEVEL = """([Aa]lert|ALERT|[Tt]race|TRACE|[Dd]ebug|DEBUG|[Nn]otice|NOTICE|[Ii]nfo?(?:rmation)?|INFO?(?:RMATION)?|[Ww]arn?(?:ing)?|WARN?(?:ING)?|[Ee]rr?(?:or)?|ERR?(?:OR)?|[Cc]rit?(?:ical)?|CRIT?(?:ICAL)?|[Ff]atal|FATAL|[Ss]evere|SEVERE|EMERG(?:ENCY)?|[Ee]merg(?:ency)?)""";
