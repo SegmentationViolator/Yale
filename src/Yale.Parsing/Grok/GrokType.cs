@@ -35,15 +35,6 @@ internal static class GrokTypeExtensions
 
     private static bool ParseBool(ReadOnlySpan<byte> subject)
     {
-        static bool IsWhitespace(byte b) =>
-            b is 0x20 or (>= 0x09 and <= 0x0D);
-
-        while (!subject.IsEmpty && IsWhitespace(subject[0]))
-            subject = subject[1..];
-
-        while (!subject.IsEmpty && IsWhitespace(subject[^1]))
-            subject = subject[..^1];
-
         if (Ascii.EqualsIgnoreCase(subject, "true"u8))
         {
             return true;

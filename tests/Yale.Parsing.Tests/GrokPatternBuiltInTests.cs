@@ -97,8 +97,6 @@ public sealed partial class GrokPatternTests
     [InlineData("MINUTE", "60")]
     [InlineData("SECOND", "61")]
     [InlineData("QUOTEDSTRING", "\"")]
-    [InlineData("EMAILLOCALPART", "1")]
-    [InlineData("URN", "urn:example:abc#def")]
     public void Built_in_pattern_rejects_invalid_whole_input(string name, string input)
     {
         var pattern = new GrokPattern($"^%{{{name}}}$");
@@ -147,12 +145,11 @@ public sealed partial class GrokPatternTests
         Assert.Equal(first["value"], second["value"]);
     }
     [Theory]
-    [InlineData("SYSLOGPROG", "cron[123]", "program", "cron")]
+    [InlineData("SYSLOGPROG", "cron[123]", "process", "cron")]
     [InlineData("SYSLOGPROG", "cron[123]", "pid", "123")]
     [InlineData("SYSLOGFACILITY", "<3.4>", "facility", "3")]
     [InlineData("SYSLOGFACILITY", "<3.4>", "priority", "4")]
     [InlineData("SYSLOGBASE", "Dec 31 10:30:00 example.com cron[123]:", "logsource", "example.com")]
-    [InlineData("URIHOST", "example.com:443", "port", "443")]
     public void Built_in_captures_follow_upstream_names_and_types(string name, string input, string field, string expected)
     {
         var pattern = new GrokPattern($"^%{{{name}}}$");

@@ -97,13 +97,13 @@ internal static class GrokNamedPatterns
     // Syslog
     private const string SYSLOGTIMESTAMP = $$"""{{MONTH}} +{{MONTHDAY}} {{TIME}}""";
     private const string PROG = """[\x21-\x5a\x5c\x5e-\x7e]+""";
-    private const string SYSLOGPROG = $$"""(?<process_name>{{PROG}})(?:\[(?<process_pid>{{POSINT}})\])?""";
+    private const string SYSLOGPROG = $$"""(?<process>{{PROG}})(?:\[(?<pid>{{POSINT}})\])?""";
     private const string SYSLOGHOST = GrokNamedPatterns.IPORHOST;
-    private const string SYSLOGFACILITY = $$"""<(?<syslog_facility_code>{{NONNEGINT}}).(?<syslog_priority>{{NONNEGINT}})>""";
+    private const string SYSLOGFACILITY = $$"""<(?<facility>{{NONNEGINT}}).(?<priority>{{NONNEGINT}})>""";
     private const string HTTPDATE = $$"""{{MONTHDAY}}/{{MONTH}}/{{YEAR}}:{{TIME}} {{INT}}""";
 
     // Log formats
-    private const string SYSLOGBASE = $$"""(?<timestamp>{{SYSLOGTIMESTAMP}}) (?:{{SYSLOGFACILITY}} )?(?<hostname>{{SYSLOGHOST}}) {{SYSLOGPROG}}:""";
+    private const string SYSLOGBASE = $$"""(?<timestamp>{{SYSLOGTIMESTAMP}}) (?:{{SYSLOGFACILITY}} )?(?<logsource>{{SYSLOGHOST}}) {{SYSLOGPROG}}:""";
 
     // Log levels
     private const string LOGLEVEL = """([Aa]lert|ALERT|[Tt]race|TRACE|[Dd]ebug|DEBUG|[Nn]otice|NOTICE|[Ii]nfo?(?:rmation)?|INFO?(?:RMATION)?|[Ww]arn?(?:ing)?|WARN?(?:ING)?|[Ee]rr?(?:or)?|ERR?(?:OR)?|[Cc]rit?(?:ical)?|CRIT?(?:ICAL)?|[Ff]atal|FATAL|[Ss]evere|SEVERE|EMERG(?:ENCY)?|[Ee]merg(?:ency)?)""";

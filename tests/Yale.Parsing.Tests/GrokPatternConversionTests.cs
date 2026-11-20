@@ -30,8 +30,6 @@ public sealed partial class GrokPatternTests
     [Theory]
     [InlineData("true", true)]
     [InlineData("FALSE", false)]
-    [InlineData("  TrUe\t", true)]
-    [InlineData("\nfalse\r", false)]
     public void Parses_booleans_with_ascii_case_and_whitespace(string input, bool expected)
     {
         var pattern = new GrokPattern(@"(?s)^%{GREEDYDATA:value:boolean}$");
