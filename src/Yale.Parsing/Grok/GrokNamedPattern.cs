@@ -173,21 +173,21 @@ internal static class GrokNamedPatterns
 
     private static readonly GrokNamedPattern SyslogProg = new(
         GrokNamedPatterns.SYSLOGPROG,
-        ImmutableArray.Create(("process_pid", GrokType.Int))
+        ImmutableArray.Create(("pid", GrokType.Int))
     );
 
     private static readonly GrokNamedPattern SyslogHost = new(GrokNamedPatterns.SYSLOGHOST, ImmutableArray<(string, GrokType)>.Empty);
 
     private static readonly GrokNamedPattern SyslogFacility = new(
         GrokNamedPatterns.SYSLOGFACILITY,
-        ImmutableArray.Create(("syslog_facility_code", GrokType.Int), ("syslog_priority", GrokType.Int))
+        ImmutableArray.Create(("facility", GrokType.Int), ("priority", GrokType.Int))
     );
 
     private static readonly GrokNamedPattern HttpDate = new(GrokNamedPatterns.HTTPDATE, ImmutableArray<(string, GrokType)>.Empty);
 
     private static readonly GrokNamedPattern SyslogBase = new(
         GrokNamedPatterns.SYSLOGBASE,
-        ImmutableArray.Create(("syslog_facility_code", GrokType.Int), ("syslog_priority", GrokType.Int), ("process_pid", GrokType.Int))
+        ImmutableArray.Create(("facility", GrokType.Int), ("priority", GrokType.Int), ("pid", GrokType.Int))
     );
 
     private static readonly GrokNamedPattern LogLevel = new(GrokNamedPatterns.LOGLEVEL, ImmutableArray<(string, GrokType)>.Empty);

@@ -6,8 +6,4 @@
     <Project Path="src/Yale.Ingestion/Yale.Ingestion.csproj" />
     <Project Path="src/Yale.Parsing/Yale.Parsing.csproj" />
   </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/Yale.Ingestion.Tests/Yale.Ingestion.Tests.csproj" />
-    <Project Path="tests/Yale.Parsing.Tests/Yale.Parsing.Tests.csproj" />
-  </Folder>
 </Solution>
